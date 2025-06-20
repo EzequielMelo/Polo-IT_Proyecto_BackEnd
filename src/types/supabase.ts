@@ -9,6 +9,70 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      adoption_status: {
+        Row: {
+          id: number;
+          name: string;
+        };
+        Insert: {
+          id?: number;
+          name: string;
+        };
+        Update: {
+          id?: number;
+          name?: string;
+        };
+        Relationships: [];
+      };
+      adoptions: {
+        Row: {
+          adopter_user_id: string | null;
+          adoption_date: string | null;
+          id: string;
+          notes: string | null;
+          pet_id: string;
+          status_id: number | null;
+        };
+        Insert: {
+          adopter_user_id?: string | null;
+          adoption_date?: string | null;
+          id?: string;
+          notes?: string | null;
+          pet_id?: string;
+          status_id?: number | null;
+        };
+        Update: {
+          adopter_user_id?: string | null;
+          adoption_date?: string | null;
+          id?: string;
+          notes?: string | null;
+          pet_id?: string;
+          status_id?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "adoptions_adopter_user_id_fkey";
+            columns: ["adopter_user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["user_id"];
+          },
+          {
+            foreignKeyName: "adoptions_pet_id_fkey";
+            columns: ["pet_id"];
+            isOneToOne: false;
+            referencedRelation: "pets";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "adoptions_status_id_fkey";
+            columns: ["status_id"];
+            isOneToOne: false;
+            referencedRelation: "adoption_status";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       gender: {
         Row: {
           id: number;
