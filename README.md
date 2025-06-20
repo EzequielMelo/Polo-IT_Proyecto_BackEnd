@@ -19,9 +19,10 @@ Authorization: Bearer <token>
 
 ### 🔹 `GET /api/posts/get-posts`
 
-- 📄 **Descripción:** Lista todas las mascotas publicadas que *no están adoptadas*.
+- 📄 **Descripción:** Lista todas las mascotas publicadas que _no están adoptadas_.
 - 🔐 **Auth:** No
 - 📤 **Respuesta:**
+
 ```json
 [
   {
@@ -52,6 +53,7 @@ Authorization: Bearer <token>
 - 📄 **Descripción:** Devuelve todos los datos de una mascota específica por ID.
 - 🔐 **Auth:** No
 - 📤 **Respuesta:**
+
 ```json
 {
   "id": "6574...",
@@ -71,6 +73,7 @@ Authorization: Bearer <token>
 - 🔐 **Auth:** Sí
 - 📥 **Tipo de body:** `multipart/form-data`
 - 📥 **Campos requeridos:**
+
   - `name`: string
   - `age`: number
   - `breed`: string
@@ -82,6 +85,7 @@ Authorization: Bearer <token>
   - `file`: imagen de la mascota
 
 - 📤 **Respuesta:**
+
 ```json
 {
   "message": "Post creado correctamente"
@@ -95,6 +99,7 @@ Authorization: Bearer <token>
 - 📄 **Descripción:** Elimina un post propio (solo si el usuario logueado es el creador).
 - 🔐 **Auth:** Sí
 - 📤 **Respuesta:**
+
 ```json
 {
   "message": "Post eliminado correctamente"
@@ -113,8 +118,9 @@ Authorization: Bearer <token>
 ## 🧪 Test con Postman
 
 - Podés testear los endpoints en Postman usando la URL base:
+
 ```
-https://<tu-proyecto>.onrender.com/api/posts
+https://proyecto-adopcion-de-mascotas.onrender.com
 ```
 
 ---
