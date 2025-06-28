@@ -8,16 +8,7 @@ export async function postPet(
   userId: string,
   file?: Express.Multer.File,
 ) {
-  const {
-    age,
-    breed,
-    description,
-    gender_id,
-    name,
-    size_id,
-    specie_id,
-    status_id,
-  } = body;
+  const { age, breed, description, gender_id, name, size_id, specie_id } = body;
 
   let petImageUrl: string | null = null;
   if (file) {
@@ -33,7 +24,7 @@ export async function postPet(
     name,
     size_id,
     specie_id,
-    status_id,
+    status_id: 1,
     photo_url: petImageUrl,
   });
 
@@ -52,7 +43,7 @@ export async function postPet(
       name,
       size_id,
       specie_id,
-      status_id,
+      status_id: 1,
       photo_url: petImageUrl,
     },
   };

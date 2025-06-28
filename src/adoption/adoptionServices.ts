@@ -209,7 +209,6 @@ export async function getAdoptionPreviewsOfMyPets(userId: string) {
 }
 
 export async function getAdoptionDetailById(adoptionId: string) {
-  console.log("adoptionId:", adoptionId);
   const { data, error } = await supabase
     .from("adoptions")
     .select(
