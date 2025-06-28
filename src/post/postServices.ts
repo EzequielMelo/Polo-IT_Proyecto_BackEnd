@@ -194,6 +194,41 @@ export async function getPosts() {
   }));
 }
 
+export async function getUserPosts(userId: string) {
+  const { data: petsInfo, error } = await supabase
+    .from("pets")
+    .select(
+      `
+      id,
+      name,
+      age,
+      breed,
+      description,
+      photo_url,
+      created_at,
+      gender:pet_gender(name),
+      size:pet_size(name),
+      specie:pet_specie(name),
+      status:pet_status(name)
+    `,
+    )
+    .eq("user_id", userId)
+    .neq("status_id", 3) // Excluir mascotas adoptadas
+    .order("created_at", { ascending: false });
+
+  if (error || !petsInfo) {
+    throw new Error("Error al obtener los posts del usuario: " + error.message);
+  }
+
+  return petsInfo.map((pet) => ({
+    ...pet,
+    gender: (pet.gender as unknown as { name: string })?.name ?? null,
+    size: (pet.size as unknown as { name: string })?.name ?? null,
+    specie: (pet.specie as unknown as { name: string })?.name ?? null,
+    status: (pet.status as unknown as { name: string })?.name ?? null,
+  }));
+}
+
 async function uploadPetImage(
   userId: string,
   file: Express.Multer.File,

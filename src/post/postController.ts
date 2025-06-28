@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import { postPet, deletePost, getPost, getPosts } from "./postServices";
+import { getUserPosts } from "./postServices";
 
 export const createPetPost: RequestHandler = async (req, res, next) => {
   try {
@@ -51,5 +52,25 @@ export const getPetPosts: RequestHandler = async (req, res, next) => {
     res.status(200).json(posts);
   } catch (err) {
     next(err); // Pasa el error al middleware de manejo de errores
+  }
+};
+
+export const getUserPostsController: RequestHandler = async (
+  req,
+  res,
+  next,
+) => {
+  try {
+    const userId = res.locals.user?.id;
+
+    if (!userId || typeof userId !== "string") {
+      res.status(401).json({ error: "Usuario no autenticado" });
+      return;
+    }
+
+    const posts = await getUserPosts(userId);
+    res.status(200).json(posts);
+  } catch (error) {
+    next(error);
   }
 };
