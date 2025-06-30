@@ -67,6 +67,63 @@ export async function approveAdoptionRequest(
   adoptionId: string,
   userId: string,
 ) {
+  // 1. Traer la solicitud de adopción (con el dueño de la mascota)
+  const { data: adoption, error: adoptionError } = await supabase
+    .from("adoptions")
+    .select("id, pet_id, status_id, owner_user_id")
+    .eq("id", adoptionId)
+    .single();
+
+  if (adoptionError || !adoption) {
+    throw new Error("No se encontró la solicitud de adopción.");
+  }
+
+  // 2. Verificar que el usuario autenticado sea el dueño de la mascota
+  if (adoption.owner_user_id !== userId) {
+    throw new Error("No tenés permiso para aprobar esta adopción.");
+  }
+
+  // 3. Verificar estado de la solicitud
+  if (adoption.status_id !== 1) {
+    throw new Error("La solicitud de adopción no está pendiente.");
+  }
+
+  // 4. Verificar que la mascota esté en estado "reservado"
+  const { data: pet, error: petError } = await supabase
+    .from("pets")
+    .select("status_id")
+    .eq("id", adoption.pet_id)
+    .single();
+
+  if (petError || !pet) {
+    throw new Error("No se encontró la mascota relacionada.");
+  }
+
+  if (pet.status_id !== 2) {
+    throw new Error("La mascota no está reservada.");
+  }
+
+  // 5. Actualizar ambas tablas
+  const [{ error: petUpdateError }, { error: adoptionUpdateError }] =
+    await Promise.all([
+      supabase.from("pets").update({ status_id: 3 }).eq("id", adoption.pet_id),
+      supabase
+        .from("adoptions")
+        .update({ status_id: 2, adoption_date: new Date() })
+        .eq("id", adoption.id),
+    ]);
+
+  if (petUpdateError || adoptionUpdateError) {
+    throw new Error(
+      "Error al aprobar la adopción: " +
+        (petUpdateError?.message || adoptionUpdateError?.message),
+    );
+  }
+
+  return { message: "Adopción aprobada correctamente." };
+}
+
+export async function denyAdoptionRequest(adoptionId: string, userId: string) {
   // 1. Traer la solicitud de adopción
   const { data: adoption, error: adoptionError } = await supabase
     .from("adoptions")
@@ -91,7 +148,7 @@ export async function approveAdoptionRequest(
 
   // 3. Verificar dueño de la mascota
   if (pet.user_id !== userId) {
-    throw new Error("No tenés permiso para aprobar esta adopción.");
+    throw new Error("No tenés permiso para rechazar esta adopción.");
   }
 
   // 4. Verificar estados
@@ -106,8 +163,8 @@ export async function approveAdoptionRequest(
   // 5. Actualizar ambas tablas
   const [{ error: petUpdateError }, { error: adoptionUpdateError }] =
     await Promise.all([
-      supabase.from("pets").update({ status_id: 3 }).eq("id", adoption.pet_id),
-      supabase.from("adoptions").update({ status_id: 2 }).eq("id", adoption.id),
+      supabase.from("pets").update({ status_id: 1 }).eq("id", adoption.pet_id),
+      supabase.from("adoptions").update({ status_id: 3 }).eq("id", adoption.id),
     ]);
 
   if (petUpdateError || adoptionUpdateError) {
@@ -256,10 +313,10 @@ export async function getAdoptionDetailById(adoptionId: string) {
     breed: string;
     description: string;
     photo_url: string;
-    gender?: { name: string };
-    size?: { name: string };
-    specie?: { name: string };
-    status?: { name: string };
+    gender: { name: string };
+    size: { name: string };
+    specie: { name: string };
+    status: { name: string };
   };
 
   type AdopterType = {
@@ -290,10 +347,10 @@ export async function getAdoptionDetailById(adoptionId: string) {
           breed: pet.breed,
           description: pet.description,
           photo_url: pet.photo_url,
-          gender: pet.gender?.name ?? null,
-          size: pet.size?.name ?? null,
-          specie: pet.specie?.name ?? null,
-          status: pet.status?.name ?? null,
+          gender: (pet.gender as unknown as { name: string })?.name ?? null,
+          size: (pet.size as unknown as { name: string })?.name ?? null,
+          specie: (pet.specie as unknown as { name: string })?.name ?? null,
+          status: (pet.status as unknown as { name: string })?.name ?? null,
         }
       : null,
 
@@ -308,4 +365,22 @@ export async function getAdoptionDetailById(adoptionId: string) {
         }
       : null,
   };
+}
+
+export async function checkAdoptionRequestExists(
+  petId: string,
+  userId: string,
+): Promise<boolean> {
+  const { data, error } = await supabase
+    .from("adoptions")
+    .select("id")
+    .eq("pet_id", petId)
+    .eq("adopter_user_id", userId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return !!data;
 }

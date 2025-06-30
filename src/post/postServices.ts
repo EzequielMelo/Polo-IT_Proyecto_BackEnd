@@ -204,7 +204,6 @@ export async function getUserPosts(userId: string) {
     `,
     )
     .eq("user_id", userId)
-    .neq("status_id", 3) // Excluir mascotas adoptadas
     .order("created_at", { ascending: false });
 
   if (error || !petsInfo) {

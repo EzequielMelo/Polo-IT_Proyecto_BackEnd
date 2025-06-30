@@ -2,9 +2,11 @@ import { RequestHandler } from "express";
 import {
   adoptionRequest,
   approveAdoptionRequest,
+  denyAdoptionRequest,
   getMyAdoptions,
   getAdoptionPreviewsOfMyPets,
   getAdoptionDetailById,
+  checkAdoptionRequestExists,
 } from "./adoptionServices";
 
 export const createAdoptionRequest: RequestHandler = async (
@@ -41,15 +43,37 @@ export const approveAdoption: RequestHandler = async (
     const { id: adoptionId } = req.params;
     const userId = res.locals.user.id; // Esto asume que tu middleware de autenticación ya puso el user en `res.locals`
 
+    console.log("userId:", userId);
+    console.log("adoptionId:", adoptionId);
+
     if (!adoptionId || typeof adoptionId !== "string") {
       res.status(400).json({ error: "ID de adopción inválido." });
       return;
     }
 
-    console.log("userId:", res.locals.user.id);
-    console.log("adoptionId:", req.params.id);
-
     const result = await approveAdoptionRequest(adoptionId, userId);
+
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const denyAdoption: RequestHandler = async (
+  req,
+  res,
+  next,
+): Promise<void> => {
+  try {
+    const { id: adoptionId } = req.params;
+    const userId = res.locals.user.id; // Esto asume que tu middleware de autenticación ya puso el user en `res.locals`
+
+    if (!adoptionId || typeof adoptionId !== "string") {
+      res.status(400).json({ error: "ID de adopción inválido." });
+      return;
+    }
+
+    const result = await denyAdoptionRequest(adoptionId, userId);
 
     res.status(200).json(result);
   } catch (err) {
@@ -114,6 +138,27 @@ export const getAdoptionDetail: RequestHandler = async (
     const adoption = await getAdoptionDetailById(id);
 
     res.status(200).json(adoption);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const checkIfUserRequestedAdoption: RequestHandler = async (
+  req,
+  res,
+  next,
+): Promise<void> => {
+  try {
+    const userId = res.locals.user?.id;
+    const { pet_id } = req.query;
+
+    if (!userId || typeof pet_id !== "string") {
+      res.status(400).json({ error: "Faltan parámetros" });
+      return;
+    }
+    const exists = await checkAdoptionRequestExists(pet_id, userId);
+
+    res.status(200).json(exists);
   } catch (error) {
     next(error);
   }
