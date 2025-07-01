@@ -1,5 +1,11 @@
 import { RequestHandler } from "express";
-import { postPet, deletePost, getPost, getPosts } from "./postServices";
+import {
+  postPet,
+  deletePost,
+  getPost,
+  getPosts,
+  getLatestPosts,
+} from "./postServices";
 import { getUserPosts } from "./postServices";
 
 export const createPetPost: RequestHandler = async (req, res, next) => {
@@ -49,6 +55,19 @@ export const getPetPost: RequestHandler = async (req, res, next) => {
 export const getPetPosts: RequestHandler = async (req, res, next) => {
   try {
     const posts = await getPosts();
+    res.status(200).json(posts);
+  } catch (err) {
+    next(err); // Pasa el error al middleware de manejo de errores
+  }
+};
+
+export const getLatestPostsController: RequestHandler = async (
+  req,
+  res,
+  next,
+) => {
+  try {
+    const posts = await getLatestPosts();
     res.status(200).json(posts);
   } catch (err) {
     next(err); // Pasa el error al middleware de manejo de errores

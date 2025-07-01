@@ -3,6 +3,7 @@ import multer from "multer";
 import {
   createPetPost,
   deletePetPost,
+  getLatestPostsController,
   getPetPost,
   getPetPosts,
   getUserPostsController,
@@ -16,6 +17,7 @@ router.post("/create", authenticateUser, upload.single("photo"), createPetPost);
 router.delete("/delete/:id", authenticateUser, deletePetPost);
 router.get("/get-post/:id", getPetPost);
 router.get("/get-posts", getPetPosts);
+router.get("/get-latest-posts", getLatestPostsController);
 router.get("/get-user-posts", authenticateUser, getUserPostsController);
 
 export default router;

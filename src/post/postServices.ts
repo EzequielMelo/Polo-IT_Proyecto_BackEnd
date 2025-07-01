@@ -185,6 +185,48 @@ export async function getPosts() {
   }));
 }
 
+export async function getLatestPosts() {
+  const { data: petsInfo, error } = await supabase
+    .from("pets")
+    .select(
+      `
+      id,
+      name,
+      age,
+      breed,
+      description,
+      photo_url,
+      created_at,
+      gender:pet_gender(name),
+      size:pet_size(name),
+      specie:pet_specie(name),
+      status:pet_status(name),
+      user:users (
+        user_id,
+        name,
+        last_name,
+        photo_url,
+        location
+      )
+    `,
+    )
+    .neq("status_id", 3) // Excluir mascotas adoptadas
+    .order("created_at", { ascending: false })
+    .limit(6); // 👈 limitar a 6 resultados
+
+  if (error || !petsInfo) {
+    throw new Error("Error al obtener los posts: " + error.message);
+  }
+
+  return petsInfo.map((pet) => ({
+    ...pet,
+    gender: (pet.gender as unknown as { name: string })?.name ?? null,
+    size: (pet.size as unknown as { name: string })?.name ?? null,
+    specie: (pet.specie as unknown as { name: string })?.name ?? null,
+    status: (pet.status as unknown as { name: string })?.name ?? null,
+  }));
+}
+
 export async function getUserPosts(userId: string) {
   const { data: petsInfo, error } = await supabase
     .from("pets")
