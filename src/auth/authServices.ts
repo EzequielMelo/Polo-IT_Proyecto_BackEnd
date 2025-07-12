@@ -100,6 +100,16 @@ export async function loginUser(
   };
 }
 
+export async function verifyToken(accessToken: string) {
+  const { data, error } = await supabaseAdmin.auth.getUser(accessToken);
+
+  if (error || !data?.user) {
+    throw new Error("Token inválido o expirado.");
+  }
+
+  return data.user;
+}
+
 async function uploadAvatar(
   userId: string,
   file: Express.Multer.File,

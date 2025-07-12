@@ -9,6 +9,7 @@ export const registerUser: RequestHandler = async (req, res) => {
     res.status(400).json({ error: (error as Error).message });
   }
 };
+
 export const loginUser: RequestHandler = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -16,5 +17,35 @@ export const loginUser: RequestHandler = async (req, res) => {
     res.status(200).json({ message: "Login exitoso", ...result });
   } catch (error) {
     res.status(400).json({ error: (error as Error).message });
+  }
+};
+
+export const checkTokenValidity: RequestHandler = async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      res.status(401).json({ error: "Token no proporcionado." });
+      return;
+    }
+
+    const token = authHeader.split(" ")[1];
+    const user = await authService.verifyToken(token);
+
+    res.status(200).json({
+      valid: true,
+      user: {
+        id: user.id,
+        email: user.email,
+      },
+    });
+  } catch (err: unknown) {
+    let errorMessage = "Token inválido.";
+    if (err instanceof Error) {
+      errorMessage = err.message;
+    }
+    res.status(401).json({
+      valid: false,
+      error: errorMessage,
+    });
   }
 };
