@@ -1,6 +1,38 @@
-# 🐶 API REST - Plataforma de Adopción de Mascotas
+# 🐾 AdoptMe – Backend API
 
-Esta API permite que los usuarios publiquen mascotas para adopción, vean publicaciones, eliminen sus propios posts y más.
+**Plataforma de adopción de mascotas | Proyecto Full-Stack**
+
+Este repositorio contiene la **API REST** del proyecto **AdoptMe**, una plataforma web orientada a facilitar la adopción responsable de mascotas.  
+La aplicación permite a los usuarios registrarse, publicar animales en adopción, gestionar solicitudes, comunicarse mediante chat y llevar un seguimiento del estado de cada adopción.
+
+👉 **Repositorio del Frontend (SPA):**  
+🔗 https://github.com/EzequielMelo/Polo-IT_Proyecto_FrontEnd
+
+---
+
+## 🧠 Descripción general del proyecto
+
+**AdoptMe** es una aplicación web **full-stack**, desarrollada como proyecto grupal.  
+Este repositorio corresponde al **backend**, el cual fue diseñado e implementado íntegramente por mí, incluyendo:
+
+- Arquitectura de la API
+- Modelado de datos en Supabase
+- Autenticación y autorización
+- Reglas de negocio
+- Integración con almacenamiento de imágenes
+
+El frontend, desarrollado como **Single Page Application (SPA)** con React + Vite, consume esta API para ofrecer una experiencia completa, moderna y responsive.
+
+---
+
+## 🧩 Arquitectura
+
+- **API REST** con Node.js + Express + TypeScript
+- **Autenticación** mediante Supabase Auth (JWT Bearer Token)
+- **Base de datos** PostgreSQL (Supabase)
+- **Storage** de imágenes con Supabase Buckets
+- Arquitectura modular (routes, controllers, services, middlewares)
+- **Deploy** en Render
 
 ---
 
